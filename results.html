@@ -9,9 +9,9 @@
         body {font-family: Helvetica, sans-serif;}
         img {width:160px; height:144px;}
         .logs {width: 320px; height: 144px;}
-        .result h2 {background:black; color: white; font-size: 12px; font-weight:bold; border: #ccc solid 1px; padding: 2px;}
-        pre {overflow: auto; font-size: 12px;display:inline-block; text-align: left}
-        .result {display: inline-block;}
+        .result h2 {background:black; color: white; font-size: 12px; font-weight:bold; border: #ccc solid 1px; padding: 2px; position:absolute; left:0; right:0; top:0; height:16px; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+        pre {overflow: auto; font-size: 12px;display:inline-block; text-align: left;vertical-align:bottom}
+        .result {display: inline-block;position:relative;padding-top:16px!important;}
         .failure h2 {background: red;}
         ol {max-height: 320px; overflow-y:scroll;}
     </style>
