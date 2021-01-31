@@ -43,6 +43,8 @@ const GB_cartridge_t GB_cart_defs[256] = {
 
 void GB_update_mbc_mappings(GB_gameboy_t *gb)
 {
+    uint16_t current_rom_bank = gb->mbc_rom_bank;
+    uint16_t current_ram_bank = gb->mbc_ram_bank;
     switch (gb->cartridge_type->mbc_type) {
         case GB_NO_MBC: return;
         case GB_MBC1:
@@ -115,6 +117,18 @@ void GB_update_mbc_mappings(GB_gameboy_t *gb)
             gb->mbc_rom_bank = gb->ezflash_jr.rom_bank;
             gb->mbc_ram_bank = gb->ezflash_jr.sram_map;
             break;
+    }
+    if(current_rom_bank != gb->mbc_rom_bank){
+        GB_log(gb, 
+               "\n[ROM BANK] %x => %x", 
+               current_rom_bank, 
+               gb->mbc_rom_bank);
+    }
+    if(current_ram_bank != gb->mbc_ram_bank){
+        GB_log(gb, 
+               "\n[ROM BANK] %x => %x", 
+               current_ram_bank, 
+               gb->mbc_ram_bank);
     }
 }
 

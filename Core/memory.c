@@ -178,6 +178,13 @@ static uint8_t read_mbc_ram(GB_gameboy_t *gb, uint16_t addr)
         }
     }
     
+//    if(gb->cartridge_type->mbc_type == GB_EZFL){
+//        GB_log(gb, "%s attempting SRAM read at %x", __EZFLASH_LOG__, addr);
+//        GB_log(gb, "%s   enable %x", __EZFLASH_LOG__, gb->mbc_ram_enable);
+//        GB_log(gb, "%s   ram size %x", __EZFLASH_LOG__, gb->mbc_ram_size);
+//        GB_log(gb, "%s   ram[%x] = %x", __EZFLASH_LOG__, addr & 0x1fff, gb->mbc_ram[(addr & 0x1fff)]);
+//    }
+    
     if ((!gb->mbc_ram_enable) &&
         gb->cartridge_type->mbc_subtype != GB_CAMERA &&
         gb->cartridge_type->mbc_type != GB_HUC1 &&
@@ -566,12 +573,10 @@ static void write_mbc(GB_gameboy_t *gb, uint16_t addr, uint8_t value)
                     case 0x20:
                     case 0xF0:
                         // Lock/Unlock registers
-                        GB_log(gb, "%s Unlock: %x = %x", __EZFLASH_LOG__, addr, value);
                         GB_ezflash_lock_register(gb, value);
                         break;
                     case 0x30: 
                         // SD mapping control register
-                        GB_log(gb, "%s SD mapping: %x = %x", __EZFLASH_LOG__, addr, value);
                         GB_ezflash_sd_map(gb, value);
                         break;
                     case 0xb0:
@@ -585,6 +590,7 @@ static void write_mbc(GB_gameboy_t *gb, uint16_t addr, uint8_t value)
                     case 0xb4:
                         // SD sector initiate read control register
                         GB_log(gb, "%s Setting control register %x", __EZFLASH_LOG__, value);
+                        GB_ezflash_sd_read_write(gb, value);
                         break;
                     case 0xc0: 
                         // SRAM mapping control register
@@ -593,7 +599,7 @@ static void write_mbc(GB_gameboy_t *gb, uint16_t addr, uint8_t value)
                     case 0xc1:
                     case 0xc2:
                         // ROM bank register
-                        
+                        GB_log(gb, "%s ROM bank register: %x = %x", __EZFLASH_LOG__, addr, value);
                         break;
                     case 0xc3: 
                         // Header checksum
@@ -602,6 +608,7 @@ static void write_mbc(GB_gameboy_t *gb, uint16_t addr, uint8_t value)
                         break;
                     case 0xc4:
                         // SRAM bank register
+                        GB_log(gb, "%s SRAM bank register: %x = %x", __EZFLASH_LOG__, addr, value);
                         break;
                     case 0xd3:
                         // gameboy version
@@ -610,18 +617,22 @@ static void write_mbc(GB_gameboy_t *gb, uint16_t addr, uint8_t value)
                         break;
                     case 0xd4:
                         // Unknown info register
+                        GB_log(gb, "%s Unknown register: %x = %x", __EZFLASH_LOG__, addr, value);
                         break;
                     case 0x36:
                         // ROM load information
+                        GB_log(gb, "%s ROM load information: %x = %x", __EZFLASH_LOG__, addr, value);
                         break;
                     case 0xe0:
                         if((value & 0x80) != 0x0) {
                             // Reset
                         }
+                        GB_log(gb, "%s Reset to loaded rom: %x = %x", __EZFLASH_LOG__, addr, value);
                         break;
                     case 0x31:
                     case 0x32:
                         // unknown register
+                        GB_log(gb, "%s Unknown register: %x = %x", __EZFLASH_LOG__, addr, value);
                         break;
                 }
             }
@@ -630,9 +641,15 @@ static void write_mbc(GB_gameboy_t *gb, uint16_t addr, uint8_t value)
             }
             else if((0x2000 <= addr) && (addr < 0x3000)) {
                 // ROM bank = value
+//                GB_log(gb, 
+//                       "\n[ROM BANK] ADDR %x = %x", addr, value);
+                gb->ezflash_jr.rom_bank = value;
             }
             else if((0x4000 <= addr) && (addr < 0x5000)) {
                 // SRAM bank = value
+            }
+            else {
+                gb->ezflash_jr.rom_bank = gb->mbc_rom_bank;
             }
             break;
     }

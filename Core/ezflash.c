@@ -7,6 +7,7 @@ GB_cartridge_t ezflash_cartridge_type = {
 };
 uint8_t* sd_card_low_buffer = NULL;
 uint8_t* sd_card_high_buffer = NULL;
+uint16_t sd_card_bytes_read = 0;
 uint8_t sd_card_status = 0;
 
 void GB_ezflash_init(GB_gameboy_t* gb)
@@ -76,23 +77,59 @@ void GB_ezflash_sd_map(GB_gameboy_t* gb, uint8_t value)
     {
         case 0:
             GB_log(gb, "%s SD mapping disabled", __EZFLASH_LOG__);
+            gb->mbc_ram_enable = 0;
             break;
         case 1:
-            GB_log(gb, "%s SD sector data set to 0xA0000", __EZFLASH_LOG__);
-            fseek(sd_card_image, 0, gb->ezflash_jr.sd_card.sector * 0x200);
             gb->mbc_ram = sd_card_low_buffer;
-            gb->mbc_ram_size = 0x800;
-            fread(sd_card_low_buffer, 1, gb->mbc_ram_size, sd_card_image);
+            gb->mbc_ram_enable = 1;
+            gb->mbc_ram_size = sd_card_bytes_read;
+            GB_log(gb, 
+                   "%s SD sector data set to 0xA0000", 
+                   __EZFLASH_LOG__);
             break;
         case 3:
             GB_log(gb, "%s SD status mapped to 0xA0000", __EZFLASH_LOG__);
             sd_card_status = 0x1;
             gb->mbc_ram = &sd_card_status;
             gb->mbc_ram_size = 1;
+            gb->mbc_ram_enable = 1;
             break;
         default:
             GB_log(gb, "%s SD mapping set to %x", __EZFLASH_LOG__, value);
             break;
+    }
+}
+
+void GB_ezflash_sd_read_write(GB_gameboy_t* gb, uint8_t value)
+{
+    fseek(sd_card_image, 0, gb->ezflash_jr.sd_card.sector * 0x200);
+    size_t total_bytes;
+    if((value & 0x80) == 0x80)
+    {
+        total_bytes = fwrite(sd_card_low_buffer, 1, 0x200 * ((0x3) & value), sd_card_image);        
+        GB_log(gb, "%s Wrote %x bytes to file", __EZFLASH_LOG__, (int) total_bytes);
+    }
+    else
+    {
+        gb->mbc_ram_size = 0x200 * value;
+        total_bytes = fread(sd_card_low_buffer, 1, gb->mbc_ram_size, sd_card_image);
+        GB_log(gb, "%s Read %x bytes from file", __EZFLASH_LOG__, (int) total_bytes);
+        gb->mbc_ram_size = total_bytes;
+        sd_card_bytes_read = total_bytes;
+        size_t i, j;
+        for(i = 0; i < total_bytes / 0x10; i++)
+        {
+            GB_log(gb, "%s    %x0: ", __EZFLASH_LOG__, (int) i);
+            for(j = 0; j < 0x10; j++)
+            {
+                uint8_t value = sd_card_low_buffer[i * 0x10 + j];
+                if(value < 0x10)
+                {
+                  GB_log(gb, "0");
+                }
+                GB_log(gb, "%x", value);
+            }
+        }
     }
 }
 

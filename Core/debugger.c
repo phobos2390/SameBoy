@@ -1551,6 +1551,7 @@ static bool mbc(GB_gameboy_t *gb, char *arguments, char *modifiers, const debugg
                 [GB_MBC5] = "MBC5",
                 [GB_HUC1] = "HUC-1",
                 [GB_HUC3] = "HUC-3",
+                [GB_EZFL] = "EZ-FL",
             };
             GB_log(gb, "%s\n", mapper_names[cartridge->mbc_type]);
         }

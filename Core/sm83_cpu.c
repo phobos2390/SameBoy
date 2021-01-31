@@ -342,7 +342,7 @@ static void flush_pending_cycles(GB_gameboy_t *gb)
 
 static void ill(GB_gameboy_t *gb, uint8_t opcode)
 {
-    GB_log(gb, "Illegal Opcode. Halting.\n");
+    GB_log(gb, "\nIllegal Opcode. Halting.\n");
     gb->interrupt_enable = 0;
     gb->halted = true;
 }

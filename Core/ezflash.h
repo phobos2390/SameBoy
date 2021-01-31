@@ -16,6 +16,8 @@ uint8_t GB_ezflash_read_sram(GB_gameboy_t* gb, uint16_t address);
 
 void GB_ezflash_sd_map(GB_gameboy_t* gb, uint8_t value);
 
+void GB_ezflash_sd_read_write(GB_gameboy_t* gb, uint8_t value);
+
 void GB_ezflash_sram_map(GB_gameboy_t* gb, uint8_t value);
 
 void GB_ezflash_load_image(GB_gameboy_t* gb, char* image_filename);
