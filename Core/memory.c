@@ -566,34 +566,47 @@ static void write_mbc(GB_gameboy_t *gb, uint16_t addr, uint8_t value)
                     case 0x20:
                     case 0xF0:
                         // Lock/Unlock registers
+                        GB_log(gb, "%s Unlock: %x = %x", __EZFLASH_LOG__, addr, value);
+                        GB_ezflash_lock_register(gb, value);
                         break;
                     case 0x30: 
                         // SD mapping control register
+                        GB_log(gb, "%s SD mapping: %x = %x", __EZFLASH_LOG__, addr, value);
+                        GB_ezflash_sd_map(gb, value);
                         break;
                     case 0xb0:
                     case 0xb1:
                     case 0xb2:
                     case 0xb3:
                         // sector number
+                        GB_ezflash_set_sector(gb, (addr & 0xFF), value);
+                        GB_log(gb, "%s Sector set to %x", __EZFLASH_LOG__, gb->ezflash_jr.sd_card.sector);
                         break;
                     case 0xb4:
                         // SD sector initiate read control register
+                        GB_log(gb, "%s Setting control register %x", __EZFLASH_LOG__, value);
                         break;
                     case 0xc0: 
                         // SRAM mapping control register
+                        GB_ezflash_sram_map(gb, value);
                         break;
                     case 0xc1:
                     case 0xc2:
                         // ROM bank register
+                        
                         break;
                     case 0xc3: 
                         // Header checksum
+                        GB_log(gb, "%s Cart header checksum: %x = %x", __EZFLASH_LOG__, addr, value);
+                        gb->ezflash_jr.header_checksum = value;
                         break;
                     case 0xc4:
                         // SRAM bank register
                         break;
                     case 0xd3:
                         // gameboy version
+                        GB_log(gb, "%s Gameboy version: %x", __EZFLASH_LOG__, value);
+                        gb->ezflash_jr.gameboy_version = value;
                         break;
                     case 0xd4:
                         // Unknown info register

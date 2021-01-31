@@ -120,7 +120,10 @@ void GB_update_mbc_mappings(GB_gameboy_t *gb)
 
 void GB_configure_cart(GB_gameboy_t *gb)
 {
-    gb->cartridge_type = &GB_cart_defs[gb->rom[0x147]];
+    if( (gb->cartridge_type == NULL) 
+     || (gb->cartridge_type->mbc_type != GB_EZFL)) {
+        gb->cartridge_type = &GB_cart_defs[gb->rom[0x147]];
+    }
     
     if (gb->rom[0x147] == 0 && gb->rom_size > 0x8000) {
         GB_log(gb, "ROM header reports no MBC, but file size is over 32Kb. Assuming cartridge uses MBC3.\n");

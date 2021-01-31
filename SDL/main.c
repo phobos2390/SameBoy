@@ -27,6 +27,8 @@ static char *filename = NULL;
 static typeof(free) *free_function = NULL;
 static char *battery_save_path_ptr;
 
+static bool ezflash_mode;
+static char* ezflash_image_filename = NULL;
 
 void set_filename(const char *new_filename, typeof(free) *new_free_function)
 {
@@ -558,6 +560,11 @@ restart:
         
     screen_size_changed();
 
+    if(ezflash_mode) {
+        GB_ezflash_init(&gb);
+        GB_ezflash_load_image(&gb, ezflash_image_filename);
+    }
+    
     /* Run emulation */
     while (true) {
         if (paused || rewind_paused) {
@@ -610,6 +617,18 @@ static bool get_arg_flag(const char *flag, int *argc, char **argv)
     return false;
 }
 
+static bool get_argi_of_flag(const char *flag, int *argi, char** argv)
+{
+    for(unsigned i = 1; i < *argi; i++) {
+        if(strcmp(argv[i], flag) == 0)
+        {
+            *argi = i;
+            return true;
+        }
+    }
+    return false;
+}
+
 int main(int argc, char **argv)
 {
 #ifdef _WIN32
@@ -620,9 +639,17 @@ int main(int argc, char **argv)
     fprintf(stderr, "SameBoy v" xstr(VERSION) "\n");
     
     bool fullscreen = get_arg_flag("--fullscreen", &argc, argv);
-
+    int ezf_index = argc;
+    ezflash_mode = false;
+    if(get_argi_of_flag("--ezflash", &ezf_index, argv)) {
+        ezflash_mode = true;
+        ezflash_image_filename = argv[ezf_index + 1];
+        argv[ezf_index] = argv[argc - 1];
+        argc -= 2;
+    }
+    
     if (argc > 2) {
-        fprintf(stderr, "Usage: %s [--fullscreen] [rom]\n", argv[0]);
+        fprintf(stderr, "Usage: %s [--fullscreen] [--ezflash img] [rom]\n", argv[0]);
         exit(1);
     }
     
