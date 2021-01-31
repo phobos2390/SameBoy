@@ -12,10 +12,12 @@ typedef struct {
         GB_MBC5,
         GB_HUC1,
         GB_HUC3,
+        GB_EZFL,
     } mbc_type;
     enum {
         GB_STANDARD_MBC,
         GB_CAMERA,
+        GB_EZFLASH_JR,
     } mbc_subtype;
     bool has_ram;
     bool has_battery;

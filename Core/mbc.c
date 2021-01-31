@@ -111,6 +111,10 @@ void GB_update_mbc_mappings(GB_gameboy_t *gb)
             gb->mbc_rom_bank = gb->huc3.rom_bank;
             gb->mbc_ram_bank = gb->huc3.ram_bank;
             break;
+        case GB_EZFL:
+            gb->mbc_rom_bank = gb->ezflash_jr.rom_bank;
+            gb->mbc_ram_bank = gb->ezflash_jr.sram_map;
+            break;
     }
 }
 

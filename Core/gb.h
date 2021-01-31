@@ -24,6 +24,7 @@
 #include "cheats.h"
 #include "rumble.h"
 #include "workboy.h"
+#include "ezflash.h"
 
 #define GB_STRUCT_VERSION 13
 
@@ -429,6 +430,24 @@ struct GB_gameboy_internal_s {
                 uint8_t padding:1;
                 uint8_t ram_bank:4;
             } huc3;
+            
+            struct {
+                uint16_t rom_bank;
+                uint8_t sram_map:6;
+                uint8_t lock:2;
+                uint8_t header_checksum:8;
+                uint8_t gameboy_version:8;
+                struct
+                {
+                    uint8_t mapping:2;
+                    union
+                    {
+                        uint32_t sector;
+                        uint8_t sector_array[sizeof(uint32_t)];
+                    };                    
+                } sd_card;
+                
+            } ezflash_jr;
         };
         uint16_t mbc_rom0_bank; /* For some MBC1 wirings. */
         bool camera_registers_mapped;

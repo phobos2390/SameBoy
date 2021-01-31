@@ -558,6 +558,70 @@ static void write_mbc(GB_gameboy_t *gb, uint16_t addr, uint8_t value)
                 case 0x4000: case 0x5000: gb->huc3.ram_bank  = value; break;
             }
             break;
+        case GB_EZFL:
+            if((addr & 0xFF00) == 0x7F00){
+                switch (addr & 0x00FF) {
+                    case 0x00:
+                    case 0x10:
+                    case 0x20:
+                    case 0xF0:
+                        // Lock/Unlock registers
+                        break;
+                    case 0x30: 
+                        // SD mapping control register
+                        break;
+                    case 0xb0:
+                    case 0xb1:
+                    case 0xb2:
+                    case 0xb3:
+                        // sector number
+                        break;
+                    case 0xb4:
+                        // SD sector initiate read control register
+                        break;
+                    case 0xc0: 
+                        // SRAM mapping control register
+                        break;
+                    case 0xc1:
+                    case 0xc2:
+                        // ROM bank register
+                        break;
+                    case 0xc3: 
+                        // Header checksum
+                        break;
+                    case 0xc4:
+                        // SRAM bank register
+                        break;
+                    case 0xd3:
+                        // gameboy version
+                        break;
+                    case 0xd4:
+                        // Unknown info register
+                        break;
+                    case 0x36:
+                        // ROM load information
+                        break;
+                    case 0xe0:
+                        if((value & 0x80) != 0x0) {
+                            // Reset
+                        }
+                        break;
+                    case 0x31:
+                    case 0x32:
+                        // unknown register
+                        break;
+                }
+            }
+            if((0x0000 <= addr) && (addr < 0x2000)) {
+                // SRAM enabled = (value == 0x0A)
+            }
+            else if((0x2000 <= addr) && (addr < 0x3000)) {
+                // ROM bank = value
+            }
+            else if((0x4000 <= addr) && (addr < 0x5000)) {
+                // SRAM bank = value
+            }
+            break;
     }
     GB_update_mbc_mappings(gb);
 }
